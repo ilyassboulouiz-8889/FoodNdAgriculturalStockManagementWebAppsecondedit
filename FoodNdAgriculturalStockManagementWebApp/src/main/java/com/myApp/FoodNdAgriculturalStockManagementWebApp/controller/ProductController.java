@@ -34,6 +34,7 @@ public class ProductController {
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
 
         Product p = new Product();
+
         p.setOwner(owner);
         p.setName(request.getName());
         p.setDescription(request.getDescription());
@@ -43,7 +44,7 @@ public class ProductController {
         p.setStorageHumidity(request.getStorageHumidity());
         p.setStatus(request.getStatus());
         p.setImageUrl(request.getImageUrl());
-        Product saved = productService.addProduct(p);
+        Product saved = productService.addProduct(p, request);
         return convertToDTO(saved);
     }
 
@@ -150,6 +151,9 @@ public class ProductController {
                     ))
                     .toList();
         }
+        String ownerFullname = (p.getOwner() != null) ? p.getOwner().getFullname() : null;
+        String ownerEmail = (p.getOwner() != null) ? p.getOwner().getEmail() : null;
+
 
         return new ProductResponseDTO(
                 p.getId(),
@@ -163,7 +167,14 @@ public class ProductController {
                 p.getStorageHumidity(),
                 p.getStatus(),
                 historyDTO,
-                p.getImageUrl()
+                p.getImageUrl(),
+                p.getShelfLifeDays(),
+                p.getExpiresAt(),
+                p.isDeleted(),
+                ownerFullname,
+                ownerEmail
+
+
         );
     }
     @DeleteMapping("/{id}")
@@ -199,6 +210,7 @@ public class ProductController {
         String email = principal.getName();
 
         Product updated = productService.updateProduct(id, request, email);
+
         return convertToDTO(updated);
     }
 

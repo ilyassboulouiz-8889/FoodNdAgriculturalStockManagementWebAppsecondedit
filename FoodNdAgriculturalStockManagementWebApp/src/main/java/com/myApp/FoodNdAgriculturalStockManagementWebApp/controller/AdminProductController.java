@@ -80,7 +80,7 @@ public class AdminProductController {
         return convertToDTO(restored);
     }
 
-    // --- Helper mapping (same style as ProductController) ---
+    // --- Helper mapping ---
     private ProductResponseDTO convertToDTO(Product p) {
         var historyDTO = (p.getHistory() == null) ? null :
                 p.getHistory().stream()
@@ -91,6 +91,9 @@ public class AdminProductController {
                                 p.getImageUrl()
                         ))
                         .toList();
+        String ownerFullname = (p.getOwner() != null) ? p.getOwner().getFullname() : null;
+        String ownerEmail = (p.getOwner() != null) ? p.getOwner().getEmail() : null;
+
 
         return new ProductResponseDTO(
                 p.getId(),
@@ -104,7 +107,12 @@ public class AdminProductController {
                 p.getStorageHumidity(),
                 p.getStatus(),
                 historyDTO,
-                p.getImageUrl()
+                p.getImageUrl(),
+                p.getShelfLifeDays(),
+                p.getExpiresAt(),
+                p.isDeleted(),
+                ownerFullname,
+                ownerEmail
         );
     }
 }

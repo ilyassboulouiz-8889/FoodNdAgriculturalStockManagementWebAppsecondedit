@@ -13,6 +13,9 @@ public class ProductStatusHistory {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusChangeSource changedBy = StatusChangeSource.USER;
 
     @Enumerated(EnumType.STRING)
     private CurrentStatus newStatus;
@@ -49,5 +52,6 @@ public class ProductStatusHistory {
     public void setChangedAt(LocalDateTime changedAt) {
         this.changedAt = changedAt;
     }
-
+    public StatusChangeSource getChangedBy() { return changedBy; }
+    public void setChangedBy(StatusChangeSource changedBy) { this.changedBy = changedBy; }
 }

@@ -24,7 +24,9 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL,  orphanRemoval = true)
     private List<Product> products;
-
+    @Column(nullable = false)
+    private boolean deleted = false;
+    private String createdAt;
     public User(int id, String fullname, String email, String passwordHash, Role  role) {
         this.id = id;
         this.fullname = fullname;
@@ -75,5 +77,13 @@ public class User {
     }
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+    public String getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

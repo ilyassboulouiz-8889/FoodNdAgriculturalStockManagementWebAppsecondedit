@@ -13,6 +13,8 @@ public class ProductRequestDTO {
     private double storageHumidity;
     private CurrentStatus status;
     private String imageUrl;
+    private Integer shelfLifeDays;
+    private Boolean shelfLifeAuto;
     // Getters and setters
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -30,5 +32,9 @@ public class ProductRequestDTO {
     public void setStatus(CurrentStatus status) { this.status = status; }
     public String getImageUrl() { return imageUrl; }       // ✅ ADD
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; } // ✅ ADD
+    public Integer getShelfLifeDays() { return shelfLifeDays; }
+    public void setShelfLifeDays(Integer shelfLifeDays) { this.shelfLifeDays = shelfLifeDays; }
 
+    public Boolean getShelfLifeAuto() { return shelfLifeAuto; }
+    public void setShelfLifeAuto(Boolean shelfLifeAuto) { this.shelfLifeAuto = shelfLifeAuto; }
 }

@@ -4,6 +4,8 @@ import com.myApp.FoodNdAgriculturalStockManagementWebApp.dto.ProductRequestDTO;
 import com.myApp.FoodNdAgriculturalStockManagementWebApp.model.CurrentStatus;
 import com.myApp.FoodNdAgriculturalStockManagementWebApp.model.Product;
 import com.myApp.FoodNdAgriculturalStockManagementWebApp.model.ProductStatusHistory;
+import com.myApp.FoodNdAgriculturalStockManagementWebApp.model.StatusChangeSource;
+import com.myApp.FoodNdAgriculturalStockManagementWebApp.service.ShelfLifeRules;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,7 +30,8 @@ public class ProductService {
 
     @Autowired
     private ProductStatusHistoryRepository historyRepository;
-
+    @Autowired
+    private ShelfLifeRules shelfLifeRules;
     public ProductService(ProductRepository productRepository,
                           ProductStatusHistoryRepository historyRepository) {
         this.productRepository = productRepository;
@@ -77,6 +80,15 @@ public class ProductService {
 
         // update product
         product.setStatus(newStatus);
+        if (product.isShelfLifeAuto()) {
+            int computed = shelfLifeRules.resolveDays(product.getCategory(), newStatus);
+            product.setShelfLifeDays(computed);
+
+            if (product.getHarvestDate() != null) {
+                product.setExpiresAt(product.getHarvestDate().plusDays(computed));
+            }
+        }
+
         product.setUpdatedAt(LocalDateTime.now());
 
         // create history record
@@ -84,6 +96,7 @@ public class ProductService {
         history.setProduct(product);
         history.setNewStatus(newStatus);
         history.setChangedAt(LocalDateTime.now());
+        history.setChangedBy(StatusChangeSource.USER);
 
         historyRepository.save(history);
 
@@ -210,7 +223,44 @@ public class ProductService {
         product.setStatus(dto.getStatus());
         product.setUpdatedAt(LocalDateTime.now());
         product.setImageUrl(dto.getImageUrl());
+        applyShelfLife(product, dto);  // ✅ recompute shelf life + expiresAt after edits
+
         return productRepository.save(product);
     }
+    private void applyShelfLife(Product p, ProductRequestDTO req) {
+        boolean auto = req.getShelfLifeAuto() == null || req.getShelfLifeAuto();
+        p.setShelfLifeAuto(auto);
+
+        Integer days = req.getShelfLifeDays();
+
+        if (auto) {
+            int computed = shelfLifeRules.resolveDays(p.getCategory(), p.getStatus());
+            p.setShelfLifeDays(computed);
+        } else {
+            if (days == null || days < 0)
+                throw new IllegalArgumentException("shelfLifeDays is required and must be >= 0");
+            p.setShelfLifeDays(days);
+        }
+
+        // ✅ choose a start date
+        LocalDateTime start = (p.getHarvestDate() != null) ? p.getHarvestDate() : p.getCreatedAt();
+        if (start == null) start = LocalDateTime.now(); // safety
+
+        if (p.getShelfLifeDays() != null) {
+            p.setExpiresAt(start.plusDays(p.getShelfLifeDays()));
+        } else {
+            p.setExpiresAt(null);
+        }
+    }
+
+    @Transactional
+    public Product addProduct(Product p, ProductRequestDTO dto) {
+        p.setCreatedAt(LocalDateTime.now());
+        p.setUpdatedAt(LocalDateTime.now());
+        applyShelfLife(p, dto);
+        return productRepository.save(p);
+    }
+
+
 
 }

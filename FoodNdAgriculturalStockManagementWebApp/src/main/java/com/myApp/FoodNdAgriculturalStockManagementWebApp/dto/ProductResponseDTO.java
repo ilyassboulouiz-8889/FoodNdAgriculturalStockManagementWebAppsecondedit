@@ -17,13 +17,34 @@ public class ProductResponseDTO {
     private double storageHumidity;
     private CurrentStatus status;
     private List<ProductStatusHistoryResponseDTO> history;
-    private  String imageUrl;
+    private String imageUrl;
+    private Integer shelfLifeDays;
+    private LocalDateTime expiresAt;
 
-    // Constructor
-    public ProductResponseDTO(int id, String name, String description, String category,
-                              LocalDateTime harvestDate, LocalDateTime createdAt, LocalDateTime updatedAt,
-                              double storageTemperature, double storageHumidity, CurrentStatus status,
-                              List<ProductStatusHistoryResponseDTO> history,  String imageUrl) {
+    // ✅ ADD THIS (for soft delete)
+    private boolean deleted;
+    private String ownerFullname;
+    private String ownerEmail;
+    // ✅ UPDATED constructor (added deleted at the end)
+    public ProductResponseDTO(
+            int id,
+            String name,
+            String description,
+            String category,
+            LocalDateTime harvestDate,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            double storageTemperature,
+            double storageHumidity,
+            CurrentStatus status,
+            List<ProductStatusHistoryResponseDTO> history,
+            String imageUrl,
+            Integer shelfLifeDays,
+            LocalDateTime expiresAt,
+            boolean deleted,
+            String ownerFullname,
+            String ownerEmail
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -36,6 +57,11 @@ public class ProductResponseDTO {
         this.status = status;
         this.history = history;
         this.imageUrl = imageUrl;
+        this.shelfLifeDays = shelfLifeDays;
+        this.expiresAt = expiresAt;
+        this.deleted = deleted;
+        this.ownerFullname = ownerFullname;
+        this.ownerEmail = ownerEmail;
     }
 
     // Getters
@@ -51,5 +77,15 @@ public class ProductResponseDTO {
     public CurrentStatus getStatus() { return status; }
     public List<ProductStatusHistoryResponseDTO> getHistory() { return history; }
     public String getImageUrl() { return imageUrl; }
+    public Integer getShelfLifeDays() { return shelfLifeDays; }
+    public LocalDateTime getExpiresAt() { return expiresAt; }
+
+    // ✅ NEW getter for frontend
+    public boolean isDeleted() { return deleted; }
+
+    // ✅ Optional setters (only if you need them)
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+    public String getOwnerFullname() { return ownerFullname; }
+    public String getOwnerEmail() { return ownerEmail; }
 
 }

@@ -15,6 +15,15 @@ public class Product {
     private int id;
     @Column(nullable = false)
     private boolean deleted = false;   // 👈 soft delete flag
+    // Product.java
+    @Column(name = "shelf_life_days")
+    private Integer shelfLifeDays; // user-provided or auto
+
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
+    @Column(name = "shelf_life_auto")
+    private boolean shelfLifeAuto = true; // true = app sets it
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
@@ -127,5 +136,23 @@ public class Product {
     }
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+    public Integer getShelfLifeDays() {
+        return shelfLifeDays;
+    }
+    public void setShelfLifeDays(Integer shelfLifeDays) {
+        this.shelfLifeDays = shelfLifeDays;
+    }
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+    public boolean isShelfLifeAuto() {
+        return shelfLifeAuto;
+    }
+    public void setShelfLifeAuto(boolean shelfLifeAuto) {
+        this.shelfLifeAuto = shelfLifeAuto;
     }
 }

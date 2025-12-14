@@ -17,4 +17,11 @@ public interface ProductStatusHistoryRepository extends JpaRepository<ProductSta
         order by h.changedAt asc
     """)
     List<ProductStatusHistory> findByProductIdWithProduct(int productId);
+    @Query("""
+    select h from ProductStatusHistory h
+    where h.product.id = :productId
+    order by h.changedAt desc
+""")
+    List<ProductStatusHistory> findLatestByProductId(int productId);
+
 }
